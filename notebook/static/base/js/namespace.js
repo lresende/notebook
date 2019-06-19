@@ -79,5 +79,3 @@ define(function(){
     return Jupyter;
 });
 
-// deprecated since 4.0, remove in 5+
-var IPython = Jupyter;
