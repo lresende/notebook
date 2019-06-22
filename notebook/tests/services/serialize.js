@@ -8,22 +8,22 @@ casper.notebook_test(function () {
     // it just captures and echos comm messages.
     this.then(function () {
         var success = this.evaluate(function () {
-            IPython._msgs = [];
-        
+            Jupyter._msgs = [];
+
             var EchoBuffers = function(comm) {
                 this.comm = comm;
                 this.comm.on_msg($.proxy(this.on_msg, this));
             };
 
             EchoBuffers.prototype.on_msg = function (msg) {
-                IPython._msgs.push(msg);
+                Jupyter._msgs.push(msg);
                 this.comm.send(msg.content.data, {}, {}, msg.buffers);
             };
 
-            IPython.notebook.kernel.comm_manager.register_target("echo", function (comm) {
+            Jupyter.notebook.kernel.comm_manager.register_target("echo", function (comm) {
                 return new EchoBuffers(comm);
             });
-        
+
             return true;
         });
         this.test.assertEquals(success, true, "Created echo comm target");
@@ -33,7 +33,7 @@ casper.notebook_test(function () {
     this.then(function () {
         var index = this.append_cell([
             "import os",
-            "from IPython.kernel.comm import Comm",
+            "from Jupyter.kernel.comm import Comm",
             "comm = Comm(target_name='echo')",
             "msgs = []",
             "def on_msg(msg):",
@@ -42,7 +42,7 @@ casper.notebook_test(function () {
         ].join('\n'), 'code');
         this.execute_cell(index);
     });
-    
+
     // send a message with binary data
     this.then(function () {
         var index = this.append_cell([
@@ -53,18 +53,18 @@ casper.notebook_test(function () {
         ].join('\n'), 'code');
         this.execute_cell(index);
     });
-    
+
     // wait for capture
     this.waitFor(function () {
         return this.evaluate(function () {
-            return IPython._msgs.length >= 3;
+            return Jupyter._msgs.length >= 3;
         });
     });
-    
+
     // validate captured buffers js-side
     this.then(function () {
         var msgs = this.evaluate(function () {
-            return IPython._msgs;
+            return Jupyter._msgs;
         });
         this.test.assertEquals(msgs.length, 3, "Captured three comm messages");
 
@@ -77,11 +77,11 @@ casper.notebook_test(function () {
         this.test.assertEquals(msgs[1].buffers.length, 0, "comm message 1 has no buffers");
         this.test.assertEquals(msgs[2].content.data, "message 2", "message 2 processed third");
         this.test.assertEquals(msgs[2].buffers.length, 2, "comm message 2 has two buffers");
-        
+
         // extract attributes to test in evaluate,
         // because the raw DataViews can't be passed across
         var buf_info = function (message, index) {
-            var buf = IPython._msgs[message].buffers[index];
+            var buf = Jupyter._msgs[message].buffers[index];
             var data = {};
             data.byteLength = buf.byteLength;
             data.bytes = [];
@@ -90,7 +90,7 @@ casper.notebook_test(function () {
             }
             return data;
         };
-        
+
         var msgs_with_buffers = [0, 2];
         for (var i = 0; i < msgs_with_buffers.length; i++) {
             msg_index = msgs_with_buffers[i];
@@ -102,7 +102,7 @@ casper.notebook_test(function () {
             this.test.assertEquals(buf1.bytes, [0, 1, 2], 'buf[1] has correct bytes in message '+msg_index);
         }
     });
-    
+
     // validate captured buffers Python-side
     this.then(function () {
         var index = this.append_cell([

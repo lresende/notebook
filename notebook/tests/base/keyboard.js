@@ -27,8 +27,8 @@ casper.notebook_test(function () {
     this.then(function () {
         this.each(unshifted.split(' '), function (self, item) {
             var result = this.evaluate(function (sc) {
-                var e = IPython.keyboard.shortcut_to_event(sc);
-                var sc2 = IPython.keyboard.event_to_shortcut(e);
+                var e = Jupyter.keyboard.shortcut_to_event(sc);
+                var sc2 = Jupyter.keyboard.event_to_shortcut(e);
                 return sc2;
             }, item);
             this.test.assertEquals(result, ambiguous_expect(item), 'Shortcut to event roundtrip: '+item);
@@ -38,7 +38,7 @@ casper.notebook_test(function () {
     this.then(function () {
         this.each(to_normalize, function (self, item) {
             var result = this.evaluate(function (pair) {
-                return IPython.keyboard.normalize_shortcut(pair[0]);
+                return Jupyter.keyboard.normalize_shortcut(pair[0]);
             }, item);
             this.test.assertEquals(result, item[1], 'Normalize shortcut: '+item[0]);
         });
@@ -47,8 +47,8 @@ casper.notebook_test(function () {
     this.then(function () {
         this.each(normalized_shortcuts, function (self, item) {
             var result = this.evaluate(function (sc) {
-                var e = IPython.keyboard.shortcut_to_event(sc);
-                var sc2 = IPython.keyboard.event_to_shortcut(e);
+                var e = Jupyter.keyboard.shortcut_to_event(sc);
+                var sc2 = Jupyter.keyboard.event_to_shortcut(e);
                 return sc2;
             }, item);
             this.test.assertEquals(result, item, 'Shortcut to event roundtrip: '+item);
@@ -75,7 +75,7 @@ casper.notebook_test(function () {
         that.evaluate(function (obj) {
             for(var k in obj){
                 if ({}.hasOwnProperty.call(obj, k)) {
-                    IPython.keyboard_manager.command_shortcuts.add_shortcut(k, function(){console.log(obj[k]);});
+                    Jupyter.keyboard_manager.command_shortcuts.add_shortcut(k, function(){console.log(obj[k]);});
                 }
             }
         }, shortcuts_test);

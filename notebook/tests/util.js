@@ -26,7 +26,7 @@ casper.open_new_notebook = function () {
     this.waitFor(this.page_loaded);
     this.waitForSelector('#kernel-python2 a, #kernel-python3 a');
     this.thenClick('#kernel-python2 a, #kernel-python3 a');
-    
+
     this.waitForPopup('');
 
     this.withPopup('', function () {this.waitForSelector('.CodeMirror-code');});
@@ -66,15 +66,15 @@ casper.open_new_notebook = function () {
 
     // Make sure the kernel has started
     this.waitFor(this.kernel_running);
-    // track the IPython busy/idle state
+    // track the Jupyter busy/idle state
     this.thenEvaluate(function () {
-        require(['base/js/namespace', 'base/js/events'], function (IPython, events) {
-        
+        require(['base/js/namespace', 'base/js/events'], function (Jupyter, events) {
+
             events.on('kernel_idle.Kernel',function () {
-                IPython._status = 'idle';
+                Jupyter._status = 'idle';
             });
             events.on('kernel_busy.Kernel',function () {
-                IPython._status = 'busy';
+                Jupyter._status = 'busy';
             });
         });
     });
@@ -83,39 +83,39 @@ casper.open_new_notebook = function () {
 casper.page_loaded = function() {
     // Return whether or not the page has been loaded.
     return this.evaluate(function() {
-        return typeof IPython !== "undefined" &&
-            IPython.page !== undefined;
+        return typeof Jupyter !== "undefined" &&
+            Jupyter.page !== undefined;
     });
 };
 
 casper.kernel_running = function() {
     // Return whether or not the kernel is running.
     return this.evaluate(function() {
-        return IPython &&
-        IPython.notebook &&
-        IPython.notebook.kernel &&
-        IPython.notebook.kernel.is_connected();
+        return Jupyter &&
+        Jupyter.notebook &&
+        Jupyter.notebook.kernel &&
+        Jupyter.notebook.kernel.is_connected();
     });
 };
 
 casper.kernel_disconnected = function() {
     return this.evaluate(function() {
-        return IPython.notebook.kernel.is_fully_disconnected();
+        return Jupyter.notebook.kernel.is_fully_disconnected();
     });
 };
 
 casper.wait_for_kernel_ready = function () {
     this.waitFor(this.kernel_running);
     this.thenEvaluate(function () {
-        IPython._kernel_ready = false;
-        IPython.notebook.kernel.kernel_info(
+        Jupyter._kernel_ready = false;
+        Jupyter.notebook.kernel.kernel_info(
             function () {
-                IPython._kernel_ready = true;
+                Jupyter._kernel_ready = true;
             });
     });
     this.waitFor(function () {
         return this.evaluate(function () {
-            return IPython._kernel_ready;
+            return Jupyter._kernel_ready;
         });
     });
 };
@@ -123,7 +123,7 @@ casper.wait_for_kernel_ready = function () {
 casper.shutdown_current_kernel = function () {
     // Shut down the current notebook's kernel.
     this.thenEvaluate(function() {
-        IPython.notebook.session.delete();
+        Jupyter.notebook.session.delete();
     });
     // We close the page right after this so we need to give it time to complete.
     this.wait(1000);
@@ -134,7 +134,7 @@ casper.delete_current_notebook = function () {
 
     // For some unknown reason, this doesn't work?!?
     this.thenEvaluate(function() {
-        IPython.notebook.delete();
+        Jupyter.notebook.delete();
     });
 };
 
@@ -142,7 +142,7 @@ casper.wait_for_busy = function () {
     // Waits for the notebook to enter a busy state.
     this.waitFor(function () {
         return this.evaluate(function () {
-            return IPython._status == 'busy';
+            return Jupyter._status == 'busy';
         });
     });
 };
@@ -151,7 +151,7 @@ casper.wait_for_idle = function () {
     // Waits for the notebook to idle.
     this.waitFor(function () {
         return this.evaluate(function () {
-            return IPython._status == 'idle';
+            return Jupyter._status == 'idle';
         });
     });
 };
@@ -163,7 +163,7 @@ casper.wait_for_output = function (cell_num, out_num) {
     this.then(function() {
         this.waitFor(function (c, o) {
             return this.evaluate(function get_output(c, o) {
-                var cell = IPython.notebook.get_cell(c);
+                var cell = Jupyter.notebook.get_cell(c);
                 return cell.output_area.outputs.length > o;
             },
             // pass parameter from the test suite js to the browser code js
@@ -173,7 +173,7 @@ casper.wait_for_output = function (cell_num, out_num) {
         function timeout() {
             this.echo("wait_for_output timed out on cell "+cell_num+", waiting for "+out_num+" outputs .");
             var pn = this.evaluate(function get_prompt(c) {
-                return (IPython.notebook.get_cell(c)|| {'input_prompt_number':'no cell'}).input_prompt_number;
+                return (Jupyter.notebook.get_cell(c)|| {'input_prompt_number':'no cell'}).input_prompt_number;
             });
             this.echo("cell prompt was :'"+pn+"'.");
         });
@@ -192,11 +192,11 @@ casper.wait_for_widget = function (widget_info) {
     // Clear the results of a previous query, if they exist.  Make sure a
     // dictionary exists to store the async results in.
     this.thenEvaluate(function(model_id) {
-        if (window.pending_msgs === undefined) { 
-            window.pending_msgs = {}; 
+        if (window.pending_msgs === undefined) {
+            window.pending_msgs = {};
         } else {
             window.pending_msgs[model_id] = -1;
-        } 
+        }
     }, {model_id: widget_info.model_id});
 
     // Wait for the pending messages to be 0.
@@ -205,9 +205,9 @@ casper.wait_for_widget = function (widget_info) {
 
             // Get the model.  Once the model is had, store it's pending_msgs
             // count in the window's dictionary.
-            IPython.notebook.kernel.widget_manager.get_model(model_id)
-            .then(function(model) {     
-                window.pending_msgs[model_id] = model.pending_msgs; 
+            Jupyter.notebook.kernel.widget_manager.get_model(model_id)
+            .then(function(model) {
+                window.pending_msgs[model_id] = model.pending_msgs;
             });
 
             // Return the pending_msgs result.
@@ -224,7 +224,7 @@ casper.wait_for_widget = function (widget_info) {
 
 casper.cell_has_outputs = function (cell_num) {
     var result = casper.evaluate(function (c) {
-        var cell = IPython.notebook.get_cell(c);
+        var cell = Jupyter.notebook.get_cell(c);
         return cell.output_area.outputs.length;
     },
     {c : cell_num});
@@ -236,13 +236,13 @@ casper.get_output_cell = function (cell_num, out_num, message) {
     // return an output of a given cell
     out_num = out_num || 0;
     var result = casper.evaluate(function (c, o) {
-        var cell = IPython.notebook.get_cell(c);
+        var cell = Jupyter.notebook.get_cell(c);
         return cell.output_area.outputs[o];
     },
     {c : cell_num, o : out_num});
     if (!result) {
         var num_outputs = casper.evaluate(function (c) {
-            var cell = IPython.notebook.get_cell(c);
+            var cell = Jupyter.notebook.get_cell(c);
             return cell.output_area.outputs.length;
         },
         {c : cell_num});
@@ -257,7 +257,7 @@ casper.get_output_cell = function (cell_num, out_num, message) {
 casper.get_cells_length = function () {
     // return the number of cells in the notebook
     var result = casper.evaluate(function () {
-        return IPython.notebook.get_cells().length;
+        return Jupyter.notebook.get_cells().length;
     });
     return result;
 };
@@ -265,7 +265,7 @@ casper.get_cells_length = function () {
 casper.set_cell_text = function(index, text){
     // Set the text content of a cell.
     this.evaluate(function (index, text) {
-        var cell = IPython.notebook.get_cell(index);
+        var cell = Jupyter.notebook.get_cell(index);
         cell.set_text(text);
     }, index, text);
 };
@@ -273,7 +273,7 @@ casper.set_cell_text = function(index, text){
 casper.get_cell_text = function(index){
     // Get the text content of a cell.
     return this.evaluate(function (index) {
-        var cell = IPython.notebook.get_cell(index);
+        var cell = Jupyter.notebook.get_cell(index);
         return cell.get_text();
     }, index);
 };
@@ -282,12 +282,12 @@ casper.insert_cell_at_bottom = function(cell_type){
     // Inserts a cell at the bottom of the notebook
     // Returns the new cell's index.
     return this.evaluate(function (cell_type) {
-        var cell = IPython.notebook.insert_cell_at_bottom(cell_type);
-        return IPython.notebook.find_cell_index(cell);
+        var cell = Jupyter.notebook.insert_cell_at_bottom(cell_type);
+        return Jupyter.notebook.find_cell_index(cell);
     }, cell_type);
 };
 
-casper.append_cell = function(text, cell_type) { 
+casper.append_cell = function(text, cell_type) {
     // Insert a cell at the bottom of the notebook and set the cells text.
     // Returns the new cell's index.
     var index = this.insert_cell_at_bottom(cell_type);
@@ -300,20 +300,20 @@ casper.append_cell = function(text, cell_type) {
 casper.execute_cell = function(index, expect_failure){
     // Asynchronously executes a cell by index.
     // Returns the cell's index.
-    
+
     if (expect_failure === undefined) expect_failure = false;
     var that = this;
     this.then(function(){
         that.evaluate(function (index) {
-            var cell = IPython.notebook.get_cell(index);
+            var cell = Jupyter.notebook.get_cell(index);
             cell.execute();
         }, index);
     });
     this.wait_for_idle();
-    
+
     this.then(function () {
         var error = that.evaluate(function (index) {
-            var cell = IPython.notebook.get_cell(index);
+            var cell = Jupyter.notebook.get_cell(index);
             var outputs = cell.output_area.outputs;
             for (var i = 0; i < outputs.length; i++) {
                 if (outputs[i].output_type == 'error') {
@@ -344,7 +344,7 @@ casper.execute_cell_then = function(index, then_callback, expect_failure) {
     this.wait_for_idle();
 
     var that = this;
-    this.then(function(){ 
+    this.then(function(){
         if (then_callback!==undefined) {
             then_callback.apply(that, [index]);
         }
@@ -367,7 +367,7 @@ casper.assert_output_equals = function(text, output_text, message) {
 };
 
 casper.wait_for_element = function(index, selector){
-    // Utility function that allows us to easily wait for an element 
+    // Utility function that allows us to easily wait for an element
     // within a cell.  Uses JQuery selector to look for the element.
     var that = this;
     this.waitFor(function() {
@@ -376,19 +376,19 @@ casper.wait_for_element = function(index, selector){
 };
 
 casper.cell_element_exists = function(index, selector){
-    // Utility function that allows us to easily check if an element exists 
+    // Utility function that allows us to easily check if an element exists
     // within a cell.  Uses JQuery selector to look for the element.
     return casper.evaluate(function (index, selector) {
-        var $cell = IPython.notebook.get_cell(index).element;
+        var $cell = Jupyter.notebook.get_cell(index).element;
         return $cell.find(selector).length > 0;
     }, index, selector);
 };
 
 casper.cell_element_function = function(index, selector, function_name, function_args){
-    // Utility function that allows us to execute a jQuery function on an 
+    // Utility function that allows us to execute a jQuery function on an
     // element within a cell.
     return casper.evaluate(function (index, selector, function_name, function_args) {
-        var $cell = IPython.notebook.get_cell(index).element;
+        var $cell = Jupyter.notebook.get_cell(index).element;
         var $el = $cell.find(selector);
         return $el[function_name].apply($el, function_args);
     }, index, selector, function_name, function_args);
@@ -406,7 +406,7 @@ casper.validate_notebook_state = function(message, mode, cell_index) {
             message + '; expecting cell ' + cell_index + ' to be the only cell selected. Got selected cell(s):'+
             (function(){
                 return casper.evaluate(function(){
-                    return IPython.notebook.get_selected_cells_indices();
+                    return Jupyter.notebook.get_selected_cells_indices();
                 })
             })()
             );
@@ -444,7 +444,7 @@ casper.validate_notebook_state = function(message, mode, cell_index) {
 casper.select_cell = function(index, moveanchor) {
     // Select a cell in the notebook.
     this.evaluate(function (i, moveanchor) {
-        IPython.notebook.select(i, moveanchor);
+        Jupyter.notebook.select(i, moveanchor);
     }, {i: index, moveanchor: moveanchor});
 };
 
@@ -459,13 +459,13 @@ casper.select_cells = function(index, bound, moveanchor) {
 
 casper.click_cell_editor = function(index) {
     // Emulate a click on a cell's editor.
-    
-    // Code Mirror does not play nicely with emulated brower events.  
+
+    // Code Mirror does not play nicely with emulated brower events.
     // Instead of trying to emulate a click, here we run code similar to
     // the code used in Code Mirror that handles the mousedown event on a
     // region of codemirror that the user can focus.
     this.evaluate(function (i) {
-        var cm = IPython.notebook.get_cell(i).code_mirror;
+        var cm = Jupyter.notebook.get_cell(i).code_mirror;
         if (cm.options.readOnly != "nocursor" && (document.activeElement != cm.display.input)){
             cm.display.input.focus();
         }
@@ -475,7 +475,7 @@ casper.click_cell_editor = function(index) {
 casper.set_cell_editor_cursor = function(index, line_index, char_index) {
     // Set the Code Mirror instance cursor's location.
     this.evaluate(function (i, l, c) {
-        IPython.notebook.get_cell(i).code_mirror.setCursor(l, c);
+        Jupyter.notebook.get_cell(i).code_mirror.setCursor(l, c);
     }, {i: index, l: line_index, c: char_index});
 };
 
@@ -491,23 +491,23 @@ casper.trigger_keydown = function() {
     for (var i = 0; i < arguments.length; i++) {
         this.evaluate(function (k) {
             var element = $(document);
-            var event = IPython.keyboard.shortcut_to_event(k, 'keydown');
+            var event = Jupyter.keyboard.shortcut_to_event(k, 'keydown');
             element.trigger(event);
-        }, {k: arguments[i]});    
+        }, {k: arguments[i]});
     }
 };
 
 casper.get_keyboard_mode = function() {
     // Get the mode of the keyboard manager.
     return this.evaluate(function() {
-        return IPython.keyboard_manager.mode;
+        return Jupyter.keyboard_manager.mode;
     }, {});
 };
 
 casper.get_notebook_mode = function() {
     // Get the mode of the notebook.
     return this.evaluate(function() {
-        return IPython.notebook.mode;
+        return Jupyter.notebook.mode;
     }, {});
 };
 
@@ -517,7 +517,7 @@ casper.get_cell = function(index) {
     // Note: Handles to DOM elements stored in the cell will be useless once in
     //       CasperJS context.
     return this.evaluate(function(i) {
-        var cell = IPython.notebook.get_cell(i);
+        var cell = Jupyter.notebook.get_cell(i);
         if (cell) {
             return cell;
         }
@@ -533,10 +533,10 @@ casper.is_cell_editor_focused = function(index) {
         if (i === null) {
             return focused_textarea.length === 0;
         } else {
-            var cell = IPython.notebook.get_cell(i);
+            var cell = Jupyter.notebook.get_cell(i);
             if (cell) {
                 return cell.code_mirror.getInputField() == focused_textarea[0];
-            }    
+            }
         }
         return false;
     }, {i : index});
@@ -587,14 +587,14 @@ casper.is_only_cell_on = function(i, on_class, off_class) {
 
 casper.cells_modes = function(){
     return this.evaluate(function(){
-        return IPython.notebook.get_cells().map(function(x,c){return x.mode})
+        return Jupyter.notebook.get_cells().map(function(x,c){return x.mode})
     }, {});
 };
 
 casper.cell_mode_is = function(index, mode) {
     // Check if a cell is in a specific mode
     return this.evaluate(function(i, m) {
-        var cell = IPython.notebook.get_cell(i);
+        var cell = Jupyter.notebook.get_cell(i);
         if (cell) {
             return cell.mode === m;
         }
@@ -606,7 +606,7 @@ casper.cell_mode_is = function(index, mode) {
 casper.cell_has_class = function(index, classes) {
     // Check if a cell has a class.
     return this.evaluate(function(i, c) {
-        var cell = IPython.notebook.get_cell(i);
+        var cell = Jupyter.notebook.get_cell(i);
         if (cell) {
             return cell.element.hasClass(c);
         }
@@ -616,7 +616,7 @@ casper.cell_has_class = function(index, classes) {
 
 casper.is_cell_rendered = function (index) {
     return this.evaluate(function(i) {
-        return !!IPython.notebook.get_cell(i).rendered;
+        return !!Jupyter.notebook.get_cell(i).rendered;
     }, {i:index});
 };
 
@@ -627,14 +627,14 @@ casper.assert_colors_equal = function (hex_color, local_color, msg) {
     // hex_color: string
     //      Hexadecimal color code, with or without preceeding hash character.
     // local_color: string
-    //      Local color representation.  Can either be hexadecimal (default for 
+    //      Local color representation.  Can either be hexadecimal (default for
     //      phantom) or rgb (default for slimer).
 
     // Remove parentheses, hashes, semi-colons, and space characters.
     hex_color = hex_color.replace(/[\(\); #]/, '');
     local_color = local_color.replace(/[\(\); #]/, '');
 
-    // If the local color is rgb, clean it up and replace 
+    // If the local color is rgb, clean it up and replace
     if (local_color.substr(0,3).toLowerCase() == 'rgb') {
         var components = local_color.substr(3).split(',');
         local_color = '';
@@ -644,7 +644,7 @@ casper.assert_colors_equal = function (hex_color, local_color, msg) {
             local_color += part;
         }
     }
-    
+
     this.test.assertEquals(hex_color.toUpperCase(), local_color.toUpperCase(), msg);
 };
 
@@ -655,12 +655,12 @@ casper.notebook_test = function(test) {
     // Echo whether or not we are running this test using SlimerJS
     if (this.evaluate(function(){
         return typeof InstallTrigger !== 'undefined';   // Firefox 1.0+
-    })) { 
-        console.log('This test is running in SlimerJS.'); 
+    })) {
+        console.log('This test is running in SlimerJS.');
         this.slimerjs = true;
     }
-    
-    // Make sure to remove the onbeforeunload callback.  This callback is 
+
+    // Make sure to remove the onbeforeunload callback.  This callback is
     // responsible for the "Are you sure you want to quit?" type messages.
     // PhantomJS ignores these prompts, SlimerJS does not which causes hangs.
     this.then(function(){
@@ -670,12 +670,12 @@ casper.notebook_test = function(test) {
     });
 
     this.then(test);
-    
+
     // Kill the kernel and delete the notebook.
     this.shutdown_current_kernel();
     // This is still broken but shouldn't be a problem for now.
     // this.delete_current_notebook();
-    
+
     // This is required to clean up the page we just finished with. If we don't call this
     // casperjs will leak file descriptors of all the open WebSockets in that page. We
     // have to set this.page=null so that next time casper.start runs, it will create a
@@ -684,7 +684,7 @@ casper.notebook_test = function(test) {
         this.page.close();
         this.page = null;
     });
-    
+
     // Run the browser automation.
     this.run(function() {
         this.test.done();
@@ -727,7 +727,7 @@ casper.dashboard_test = function (test) {
         this.page.close();
         this.page = null;
     });
-    
+
     // Run the browser automation.
     this.run(function() {
         this.test.done();
@@ -742,16 +742,16 @@ casper.event_test = function (name, events, action, timeout) {
     this.thenEvaluate(function (events) {
         var make_handler = function (event) {
             return function () {
-                IPython._events_triggered.push(event);
-                IPython.notebook.events.off(event, null, IPython._event_handlers[event]);
-                delete IPython._event_handlers[event];
+                Jupyter._events_triggered.push(event);
+                Jupyter.notebook.events.off(event, null, Jupyter._event_handlers[event]);
+                delete Jupyter._event_handlers[event];
             };
         };
-        IPython._event_handlers = {};
-        IPython._events_triggered = [];
+        Jupyter._event_handlers = {};
+        Jupyter._events_triggered = [];
         for (var i=0; i < events.length; i++) {
-            IPython._event_handlers[events[i]] = make_handler(events[i]);
-            IPython.notebook.events.on(events[i], IPython._event_handlers[events[i]]);
+            Jupyter._event_handlers[events[i]] = make_handler(events[i]);
+            Jupyter.notebook.events.on(events[i], Jupyter._event_handlers[events[i]]);
         }
     }, [events]);
 
@@ -761,17 +761,17 @@ casper.event_test = function (name, events, action, timeout) {
     // wait for all the events to be triggered
     this.waitFor(function () {
         return this.evaluate(function (events) {
-            return IPython._events_triggered.length >= events.length;
+            return Jupyter._events_triggered.length >= events.length;
         }, [events]);
     }, undefined, undefined, timeout);
 
     // test that the events were triggered in the proper order
     this.then(function () {
         var triggered = this.evaluate(function () {
-            return IPython._events_triggered;
+            return Jupyter._events_triggered;
         });
         var handlers = this.evaluate(function () {
-            return Object.keys(IPython._event_handlers);
+            return Object.keys(Jupyter._event_handlers);
         });
         this.test.assertEquals(triggered.length, events.length, name + ': ' + events.length + ' events were triggered');
         this.test.assertEquals(handlers.length, 0, name + ': all handlers triggered');
@@ -782,9 +782,9 @@ casper.event_test = function (name, events, action, timeout) {
 
     // turn off any remaining event listeners
     this.thenEvaluate(function () {
-        for (var event in IPython._event_handlers) {
-            IPython.notebook.events.off(event, null, IPython._event_handlers[event]);
-            delete IPython._event_handlers[event];
+        for (var event in Jupyter._event_handlers) {
+            Jupyter.notebook.events.off(event, null, Jupyter._event_handlers[event]);
+            delete Jupyter._event_handlers[event];
         }
     });
 };

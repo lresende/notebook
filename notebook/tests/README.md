@@ -1,4 +1,4 @@
-# IPython Notebook JavaScript Tests
+# Jupyter Notebook JavaScript Tests
 
 This directory includes regression tests for the web notebook. These tests
 depend on [CasperJS](http://casperjs.org/), which in turn requires a recent

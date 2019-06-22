@@ -4,32 +4,32 @@ casper.notebook_test(function () {
     var that = this;
     var widget = function (name) {
         return that.evaluate(function (name) {
-            return (IPython.notification_area.widget(name) !== undefined);
+            return (Jupyter.notification_area.widget(name) !== undefined);
         }, name);
     };
 
     var get_widget = function (name) {
         return that.evaluate(function (name) {
-            return (IPython.notification_area.get_widget(name) !== undefined);
+            return (Jupyter.notification_area.get_widget(name) !== undefined);
         }, name);
     };
 
     var new_notification_widget = function (name) {
         return that.evaluate(function (name) {
-            return (IPython.notification_area.new_notification_widget(name) !== undefined);
+            return (Jupyter.notification_area.new_notification_widget(name) !== undefined);
         }, name);
     };
 
     var widget_has_class = function (name, class_name) {
         return that.evaluate(function (name, class_name) {
-            var w = IPython.notification_area.get_widget(name);
+            var w = Jupyter.notification_area.get_widget(name);
             return w.element.hasClass(class_name);
         }, name, class_name);
     };
 
     var widget_message = function (name) {
         return that.evaluate(function (name) {
-            var w = IPython.notification_area.get_widget(name);
+            var w = Jupyter.notification_area.get_widget(name);
             return w.get_message();
         }, name);
     };
@@ -51,7 +51,7 @@ casper.notebook_test(function () {
 
     // test creating 'info' messages
     this.thenEvaluate(function () {
-        var tnw = IPython.notification_area.widget('test');
+        var tnw = Jupyter.notification_area.widget('test');
         tnw.info('test info');
     });
     this.waitUntilVisible('#notification_test', function () {
@@ -61,7 +61,7 @@ casper.notebook_test(function () {
 
     // test creating 'warning' messages
     this.thenEvaluate(function () {
-        var tnw = IPython.notification_area.widget('test');
+        var tnw = Jupyter.notification_area.widget('test');
         tnw.warning('test warning');
     });
     this.waitUntilVisible('#notification_test', function () {
@@ -71,7 +71,7 @@ casper.notebook_test(function () {
 
     // test creating 'danger' messages
     this.thenEvaluate(function () {
-        var tnw = IPython.notification_area.widget('test');
+        var tnw = Jupyter.notification_area.widget('test');
         tnw.danger('test danger');
     });
     this.waitUntilVisible('#notification_test', function () {
@@ -81,7 +81,7 @@ casper.notebook_test(function () {
 
     // test message timeout
     this.thenEvaluate(function () {
-        var tnw = IPython.notification_area.widget('test');
+        var tnw = Jupyter.notification_area.widget('test');
         tnw.set_message('test timeout', 1000);
     });
     this.waitUntilVisible('#notification_test', function () {
@@ -93,7 +93,7 @@ casper.notebook_test(function () {
 
     // test click callback
     this.thenEvaluate(function () {
-        var tnw = IPython.notification_area.widget('test');
+        var tnw = Jupyter.notification_area.widget('test');
         tnw._clicked = false;
         tnw.set_message('test click', undefined, function () {
             tnw._clicked = true;
@@ -106,7 +106,7 @@ casper.notebook_test(function () {
     });
     this.waitFor(function () {
         return this.evaluate(function () {
-            return IPython.notification_area.widget('test')._clicked;
+            return Jupyter.notification_area.widget('test')._clicked;
         });
     }, function () {
         this.waitWhileVisible('#notification_test', function () {

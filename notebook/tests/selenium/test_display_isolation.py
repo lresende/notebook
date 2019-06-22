@@ -7,7 +7,7 @@ from .utils import wait_for_tag
 
 
 def test_display_isolation(notebook):
-    import_ln = "from IPython.core.display import HTML, SVG, display, display_svg"
+    import_ln = "from Jupyter.core.display import HTML, SVG, display, display_svg"
     notebook.edit_cell(index=0, content=import_ln)
     notebook.execute_cell(notebook.current_cell)
     try:

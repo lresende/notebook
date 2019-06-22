@@ -25,7 +25,7 @@ casper.notebook_test(function () {
 
         // wait for shutdown to go through
         that.waitFor(function() { return this.evaluate(function() {
-            return IPython.notebook.kernel.is_connected() === false;
+            return Jupyter.notebook.kernel.is_connected() === false;
         })});
 
         // Click on one of the restarts
@@ -33,7 +33,7 @@ casper.notebook_test(function () {
 
         //  Kernel should get connected, no need for confirmation.
         that.waitFor(function() { return this.evaluate(function() {
-                return IPython.notebook.kernel.is_connected() === true;
+                return Jupyter.notebook.kernel.is_connected() === true;
         })});
         that.then(function() {
             that.test.assert(true, "no confirmation for " + selector + " after session shutdown")

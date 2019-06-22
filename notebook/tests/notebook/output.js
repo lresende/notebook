@@ -3,7 +3,7 @@
 //
 
 casper.notebook_test(function () {
-    
+
     this.compare_outputs = function(results, expected) {
         for (var i = 0; i < results.length; i++) {
             var r = results[i];
@@ -19,34 +19,34 @@ casper.notebook_test(function () {
         this.then(function () {
             this.echo("Test coalesced output: " + msg);
         });
-        
+
         this.thenEvaluate(function (code) {
-            IPython.notebook.insert_cell_at_index("code", 0);
-            var cell = IPython.notebook.get_cell(0);
+            Jupyter.notebook.insert_cell_at_index("code", 0);
+            var cell = Jupyter.notebook.get_cell(0);
             cell.set_text(code);
             cell.execute();
         }, {code: code});
-        
+
         this.wait_for_output(0);
-        
+
         this.then(function () {
             var results = this.evaluate(function () {
-                var cell = IPython.notebook.get_cell(0);
+                var cell = Jupyter.notebook.get_cell(0);
                 return cell.output_area.outputs;
             });
             this.test.assertEquals(results.length, expected.length, "correct number of outputs");
             this.compare_outputs(results, expected);
         });
-        
+
     };
 
     this.thenEvaluate(function () {
-        IPython.notebook.insert_cell_at_index("code", 0);
-        var cell = IPython.notebook.get_cell(0);
+        Jupyter.notebook.insert_cell_at_index("code", 0);
+        var cell = Jupyter.notebook.get_cell(0);
         cell.set_text([
             "from __future__ import print_function",
             "import sys",
-            "from IPython.display import display, clear_output"
+            "from Jupyter.display import display, clear_output"
             ].join("\n")
         );
         cell.execute();
@@ -64,7 +64,7 @@ casper.notebook_test(function () {
             text: "1\n2\n3\n"
         }]
     );
-    
+
     this.test_coalesced_output("stdout+sdterr", [
         "print(1)",
         "sys.stdout.flush()",
@@ -99,7 +99,7 @@ casper.notebook_test(function () {
         }]
     );
     this.test_coalesced_output("test nested svg", [
-        'from IPython.display import SVG',
+        'from Jupyter.display import SVG',
         'nested_svg="""',
         '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" >',
         '  <svg x="0">',
@@ -112,8 +112,8 @@ casper.notebook_test(function () {
         'SVG(nested_svg)'
         ].join("\n"), [{
             output_type: "execute_result",
-            data: { 
-            "text/plain" : "<IPython.core.display.SVG object>",
+            data: {
+            "text/plain" : "<Jupyter.core.display.SVG object>",
             "image/svg+xml": [
               '<svg height="200" width="100" xmlns="http://www.w3.org/2000/svg">',
               '  <svg x="0">',
@@ -132,8 +132,8 @@ casper.notebook_test(function () {
     });
 
     this.thenEvaluate(function () {
-        IPython.notebook.insert_cell_at_index("code", 0);
-        var cell = IPython.notebook.get_cell(0);
+        Jupyter.notebook.insert_cell_at_index("code", 0);
+        var cell = Jupyter.notebook.get_cell(0);
         cell.set_text(["print(1)",
         "sys.stdout.flush()",
         "print(2)",
@@ -149,7 +149,7 @@ casper.notebook_test(function () {
         "sys.stdout.flush()",
         ].join('\n'));
         cell.execute();
-        var kernel = IPython.notebook.kernel;
+        var kernel = Jupyter.notebook.kernel;
         var msg_id = cell.last_msg_id;
         var callback_id = 'mycallbackid'
         cell.iopub_messages = [];
@@ -168,9 +168,9 @@ casper.notebook_test(function () {
         }, false);
         kernel.output_callback_overrides_push(msg_id, callback_id);
     });
-    
+
     this.wait_for_idle();
-    
+
     this.then(function () {
         var expected_callback = [{
             output_type: "stream",
@@ -199,7 +199,7 @@ casper.notebook_test(function () {
             text: "back to cell\n"
         }]
         var returned = this.evaluate(function () {
-            var cell = IPython.notebook.get_cell(0);
+            var cell = Jupyter.notebook.get_cell(0);
             return [cell.output_area.outputs, cell.iopub_messages];
         });
         var cell_results = returned[0];
@@ -215,11 +215,11 @@ casper.notebook_test(function () {
     });
 
     this.thenEvaluate(function () {
-        IPython.notebook.insert_cell_at_index("code", 0);
-        var cell = IPython.notebook.get_cell(0);
+        Jupyter.notebook.insert_cell_at_index("code", 0);
+        var cell = Jupyter.notebook.get_cell(0);
         cell.set_text("'end'");
         cell.execute();
-        var kernel = IPython.notebook.kernel;
+        var kernel = Jupyter.notebook.kernel;
         var msg_id = cell.last_msg_id;
         var callback_id = 'mycallbackid2'
         cell.iopub_messages = [];
@@ -235,9 +235,9 @@ casper.notebook_test(function () {
         }, false);
         kernel.output_callback_overrides_push(msg_id, callback_id);
     });
-    
+
     this.wait_for_idle();
-    
+
     this.then(function () {
         var expected_callback = [{
             output_type: "execute_result",
@@ -247,7 +247,7 @@ casper.notebook_test(function () {
         }];
         var expected_cell = [];
         var returned = this.evaluate(function () {
-            var cell = IPython.notebook.get_cell(0);
+            var cell = Jupyter.notebook.get_cell(0);
             return [cell.output_area.outputs, cell.iopub_messages];
         });
         var cell_results = returned[0];

@@ -14,7 +14,7 @@ casper.notebook_test(function () {
     var cell_is_mergeable = function (index) {
         // Get the mergeable status of a cell.
         return that.evaluate(function (index) {
-            var cell = IPython.notebook.get_cell(index);
+            var cell = Jupyter.notebook.get_cell(index);
             return cell.is_mergeable();
         }, index);
     };
@@ -22,7 +22,7 @@ casper.notebook_test(function () {
     var cell_is_splittable = function (index) {
         // Get the splittable status of a cell.
         return that.evaluate(function (index) {
-            var cell = IPython.notebook.get_cell(index);
+            var cell = Jupyter.notebook.get_cell(index);
             return cell.is_splittable();
         }, index);
     };
@@ -46,7 +46,7 @@ casper.notebook_test(function () {
         this.test.assertEquals(this.get_cell_text(1), 'cd', 'split; Verify that cell 1 has the second half.');
         this.validate_notebook_state('split', 'edit', 1);
         this.select_cell(0); // Move up to cell 0
-        this.evaluate(function() { IPython.notebook.extend_selection_by(1);});
+        this.evaluate(function() { Jupyter.notebook.extend_selection_by(1);});
         this.trigger_keydown('shift-m'); // Merge
         this.validate_notebook_state('merge', 'command', 0);
         this.test.assertEquals(this.get_cell_text(0), a, 'merge; Verify that cell 0 has the merged contents.');
@@ -63,7 +63,7 @@ casper.notebook_test(function () {
     });
 
     this.thenEvaluate(function() {
-        IPython.notebook.get_cell(1).metadata.deletable = false;
+        Jupyter.notebook.get_cell(1).metadata.deletable = false;
     });
 
     // Check that merge/split status are correct
@@ -81,7 +81,7 @@ casper.notebook_test(function () {
         this.select_cell(0);
     });
     this.thenEvaluate(function() {
-        IPython.notebook.merge_cell_above();
+        Jupyter.notebook.merge_cell_above();
     });
     this.then(function() {
         this.test.assertEquals(this.get_cells_length(), N, 'Merge cell 0 above: There are still '+N+' cells');
@@ -110,7 +110,7 @@ casper.notebook_test(function () {
         this.select_cell(1);
     });
     this.thenEvaluate(function () {
-        IPython.notebook.merge_cell_above();
+        Jupyter.notebook.merge_cell_above();
     });
     this.then(function () {
         this.test.assertEquals(this.get_cells_length(), N, 'Merge cell 1 up: There are still '+N+' cells');
@@ -130,7 +130,7 @@ casper.notebook_test(function () {
         this.test.assertEquals(this.get_cell_text(0), a, 'Split cell 1: Cell 0 is unchanged');
         this.test.assertEquals(this.get_cell_text(1), b, 'Split cell 1: Cell 1 is unchanged');
         this.test.assertEquals(this.get_cell_text(2), c, 'Split cell 1: Cell 2 is unchanged');
-        this.validate_notebook_state('ctrl-shift--', 'edit', 1); 
+        this.validate_notebook_state('ctrl-shift--', 'edit', 1);
     });
 
     // Try to merge cell 1 down, should fail, as 1 is locked
@@ -152,7 +152,7 @@ casper.notebook_test(function () {
         this.select_cell(2);
     });
     this.thenEvaluate(function () {
-        IPython.notebook.merge_cell_above();
+        Jupyter.notebook.merge_cell_above();
     });
     this.then(function () {
         this.test.assertEquals(this.get_cells_length(), N, 'Merge cell 2 up: There are still '+N+' cells');

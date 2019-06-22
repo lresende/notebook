@@ -14,7 +14,7 @@ casper.notebook_test(function () {
             );
         }
     });
-    
+
     var that = this;
     // syntax highlighting
     [
@@ -33,7 +33,7 @@ casper.notebook_test(function () {
     ].map(function (mode) {
         (mode.from || []).concat(mode.to || []).map(function(from){
             casper.evaluate(function(from, expected, error_expected){
-                IPython.utils.requireCodeMirrorMode(from, function(observed){
+                Jupyter.utils.requireCodeMirrorMode(from, function(observed){
                     window.callPhantom({
                         provided: from,
                         expected: expected,

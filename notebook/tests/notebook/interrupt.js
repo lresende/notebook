@@ -1,9 +1,9 @@
 //
-// Test kernel interrupt 
+// Test kernel interrupt
 //
 casper.notebook_test(function () {
     this.evaluate(function () {
-        var cell = IPython.notebook.get_cell(0);
+        var cell = Jupyter.notebook.get_cell(0);
         cell.set_text(
             'import time'+
             '\nfor x in range(3):'+
@@ -26,7 +26,7 @@ casper.notebook_test(function () {
 
     // run cell 0 again, now interrupting using keyboard shortcut
     this.thenEvaluate(function () {
-        var cell = IPython.notebook.get_cell(0);
+        var cell = Jupyter.notebook.get_cell(0);
         cell.clear_output();
         cell.execute();
     });
@@ -35,9 +35,9 @@ casper.notebook_test(function () {
     this.then(function(){
         this.trigger_keydown('esc', 'i', 'i');
     });
-    
+
     this.wait_for_output(0);
-    
+
     this.then(function () {
         var result = this.get_output_cell(0);
         this.test.assertEquals(result.ename, 'KeyboardInterrupt', 'keyboard interrupt (shortcut)');

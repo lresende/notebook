@@ -3,7 +3,7 @@
 //toJSON fromJSON toJSON and do a string comparison
 
 
-// this is just a copy of OutputArea.mime_mape_r in IPython/html/static/notebook/js/outputarea.js
+// this is just a copy of OutputArea.mime_mape_r in Jupyter/html/static/notebook/js/outputarea.js
 mime =  {
         "text" : "text/plain",
         "html" : "text/html",
@@ -33,7 +33,7 @@ function assert_has(short_name, json, result, result2) {
     this.test.assertTrue(result2.data.hasOwnProperty(long_name),
             'fromJSON() embedded ' + short_name + ' gets mime key ' + long_name);
 }
-          
+
 // helper function for checkout that the first two cells have a particular
 // output_type (either 'execute_result' or 'display_data'), and checks the to/fromJSON
 // for a set of mimetype keys, ensuring the old short names ('javascript', 'text',
@@ -41,9 +41,9 @@ function assert_has(short_name, json, result, result2) {
 function check_output_area(output_type, keys) {
     this.wait_for_output(0);
     var json = this.evaluate(function() {
-        var json = IPython.notebook.get_cell(0).output_area.toJSON();
+        var json = Jupyter.notebook.get_cell(0).output_area.toJSON();
         // appended cell will initially be empty, let's add some output
-        IPython.notebook.get_cell(1).output_area.fromJSON(json);
+        Jupyter.notebook.get_cell(1).output_area.fromJSON(json);
         return json;
     });
     // The evaluate call above happens asynchronously: wait for cell[1] to have output
@@ -63,8 +63,8 @@ function check_output_area(output_type, keys) {
 // the first one
 function clear_and_execute(that, code) {
     that.evaluate(function() {
-        IPython.notebook.get_cell(0).clear_output();
-        IPython.notebook.get_cell(1).clear_output();
+        Jupyter.notebook.get_cell(0).clear_output();
+        Jupyter.notebook.get_cell(1).clear_output();
     });
     that.then(function () {
         that.set_cell_text(0, code);
@@ -75,11 +75,11 @@ function clear_and_execute(that, code) {
 
 casper.notebook_test(function () {
     this.evaluate(function () {
-        var cell = IPython.notebook.get_cell(0);
+        var cell = Jupyter.notebook.get_cell(0);
         // "we have to make messes to find out who we are"
         cell.set_text([
             "%%javascript",
-            "IPython.notebook.insert_cell_below('code')"
+            "Jupyter.notebook.insert_cell_below('code')"
             ].join('\n')
             );
     });
@@ -92,14 +92,14 @@ casper.notebook_test(function () {
             'testing JS embedded with mime key');
     });
 
-    //this.thenEvaluate(function() { IPython.notebook.save_notebook(); });
+    //this.thenEvaluate(function() { Jupyter.notebook.save_notebook(); });
     this.then(function () {
         clear_and_execute(this, [
             "%%javascript",
             "var a=5;"
             ].join('\n'));
     });
-   
+
 
     this.then(function () {
         check_output_area.apply(this, ['display_data', ['javascript']]);
@@ -109,59 +109,59 @@ casper.notebook_test(function () {
     this.then(function() {
         clear_and_execute(this, '%lsmagic');
     });
-   
+
     this.then(function () {
         check_output_area.apply(this, ['execute_result', ['text', 'json']]);
     });
 
     this.then(function() {
         clear_and_execute(this,
-            "x = %lsmagic\nfrom IPython.display import display; display(x)");
+            "x = %lsmagic\nfrom Jupyter.display import display; display(x)");
     });
 
     this.then(function ( ) {
         check_output_area.apply(this, ['display_data', ['text', 'json']]);
     });
-    
+
     this.then(function() {
         clear_and_execute(this,
-            "from IPython.display import Latex; Latex('$X^2$')");
+            "from Jupyter.display import Latex; Latex('$X^2$')");
     });
-    
+
     this.then(function ( ) {
         check_output_area.apply(this, ['execute_result', ['text', 'latex']]);
     });
 
     this.then(function() {
         clear_and_execute(this,
-            "from IPython.display import Latex, display; display(Latex('$X^2$'))");
+            "from Jupyter.display import Latex, display; display(Latex('$X^2$'))");
     });
-    
+
     this.then(function ( ) {
         check_output_area.apply(this, ['display_data', ['text', 'latex']]);
     });
-    
+
     this.then(function() {
         clear_and_execute(this,
-            "from IPython.display import HTML; HTML('<b>it works!</b>')");
+            "from Jupyter.display import HTML; HTML('<b>it works!</b>')");
     });
-    
+
     this.then(function ( ) {
         check_output_area.apply(this, ['execute_result', ['text', 'html']]);
     });
 
     this.then(function() {
         clear_and_execute(this,
-            "from base64 import b64decode;" + 
-            "black_dot_png = b64decode(" + black_dot_png + ");" + 
+            "from base64 import b64decode;" +
+            "black_dot_png = b64decode(" + black_dot_png + ");" +
             "black_dot_jpeg = b64decode(" + black_dot_jpeg + ")"
         );
     });
     this.then(function() {
         clear_and_execute(this,
-            "from IPython.display import HTML, display; display(HTML('<b>it works!</b>'))");
+            "from Jupyter.display import HTML, display; display(HTML('<b>it works!</b>'))");
     });
-    
+
     this.then(function ( ) {
         check_output_area.apply(this, ['display_data', ['text', 'html']]);
     });
@@ -169,19 +169,19 @@ casper.notebook_test(function () {
 
     this.then(function() {
         clear_and_execute(this,
-            "from IPython.display import Image; Image(black_dot_png)");
+            "from Jupyter.display import Image; Image(black_dot_png)");
     });
-    this.thenEvaluate(function() { IPython.notebook.save_notebook(); });
-    
+    this.thenEvaluate(function() { Jupyter.notebook.save_notebook(); });
+
     this.then(function ( ) {
         check_output_area.apply(this, ['execute_result', ['text', 'png']]);
     });
-    
+
     this.then(function() {
         clear_and_execute(this,
-            "from IPython.display import Image, display; display(Image(black_dot_png))");
+            "from Jupyter.display import Image, display; display(Image(black_dot_png))");
     });
-    
+
     this.then(function ( ) {
         check_output_area.apply(this, ['display_data', ['text', 'png']]);
     });
@@ -189,57 +189,57 @@ casper.notebook_test(function () {
 
     this.then(function() {
         clear_and_execute(this,
-            "from IPython.display import Image; Image(black_dot_jpeg, format='jpeg')");
+            "from Jupyter.display import Image; Image(black_dot_jpeg, format='jpeg')");
     });
-    
+
     this.then(function ( ) {
         check_output_area.apply(this, ['execute_result', ['text', 'jpeg']]);
     });
-    
+
     this.then(function() {
         clear_and_execute(this,
-            "from IPython.display import Image, display; display(Image(black_dot_jpeg, format='jpeg'))");
+            "from Jupyter.display import Image, display; display(Image(black_dot_jpeg, format='jpeg'))");
     });
-    
+
     this.then(function ( ) {
         check_output_area.apply(this, ['display_data', ['text', 'jpeg']]);
     });
-    
+
     this.then(function() {
         clear_and_execute(this,
-            "from IPython.core.display import SVG; SVG(" + svg + ")");
+            "from Jupyter.core.display import SVG; SVG(" + svg + ")");
     });
-    
+
     this.then(function ( ) {
         check_output_area.apply(this, ['execute_result', ['text', 'svg']]);
     });
 
     this.then(function() {
         clear_and_execute(this,
-            "from IPython.core.display import SVG, display; display(SVG(" + svg + "))");
+            "from Jupyter.core.display import SVG, display; display(SVG(" + svg + "))");
     });
-    
+
     this.then(function ( ) {
         check_output_area.apply(this, ['display_data', ['text', 'svg']]);
     });
-    
-    this.thenEvaluate(function() { IPython.notebook.save_notebook(); });
+
+    this.thenEvaluate(function() { Jupyter.notebook.save_notebook(); });
 
     this.then(function() {
         clear_and_execute(this, [
-            "from IPython.core.formatters import HTMLFormatter",
+            "from Jupyter.core.formatters import HTMLFormatter",
             "x = HTMLFormatter()",
             "x.format_type = 'text/superfancymimetype'",
             "get_ipython().display_formatter.formatters['text/superfancymimetype'] = x",
-            "from IPython.display import HTML, display",
+            "from Jupyter.display import HTML, display",
             'display(HTML("yo"))',
             "HTML('hello')"].join('\n')
             );
-             
+
     });
-    
+
     this.wait_for_output(0, 1);
-    
+
     this.then(function () {
         var long_name = 'text/superfancymimetype';
         var result = this.get_output_cell(0);
@@ -248,7 +248,7 @@ casper.notebook_test(function () {
         result = this.get_output_cell(0, 1);
         this.test.assertTrue(result.data.hasOwnProperty(long_name),
             'execute_result custom mimetype ' + long_name);
-    
+
     });
-    
+
 });

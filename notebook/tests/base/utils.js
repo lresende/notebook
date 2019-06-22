@@ -26,10 +26,10 @@ casper.notebook_test(function () {
     ].join("\n");
 
     var result = this.evaluate(function (input) {
-        return IPython.utils.fixConsole(input);
+        return Jupyter.utils.fixConsole(input);
     }, input);
 
-    this.test.assertEquals(result, output, "IPython.utils.fixConsole() handles [0m correctly");
+    this.test.assertEquals(result, output, "Jupyter.utils.fixConsole() handles [0m correctly");
 
     // Test fixOverwrittenChars
     var overwriting_test_cases = [
@@ -43,7 +43,7 @@ casper.notebook_test(function () {
     var that = this;
     overwriting_test_cases.forEach(function(testcase){
         var result = that.evaluate(function (input) {
-            return IPython.utils.fixOverwrittenChars(input);
+            return Jupyter.utils.fixOverwrittenChars(input);
         }, testcase.input);
         that.test.assertEquals(result, testcase.result, "Overwriting characters processed");
     });
@@ -58,7 +58,7 @@ casper.notebook_test(function () {
       'x2\r\r',
       '1\r',
     ].join('');
-    
+
     var output = [
       'hasrn\n',
       'hasn\n',
@@ -66,13 +66,13 @@ casper.notebook_test(function () {
       'hellof\n',
       '123\r'
     ].join('');
-    
+
     var result = this.evaluate(function (input) {
-      return IPython.utils.fixCarriageReturn(input);
+      return Jupyter.utils.fixCarriageReturn(input);
     }, input);
 
-    this.test.assertEquals(result, output, "IPython.utils.fixCarriageReturns works");
-    
+    this.test.assertEquals(result, output, "Jupyter.utils.fixCarriageReturns works");
+
     // Test load_extensions
 
     this.thenEvaluate(function() {
@@ -85,7 +85,7 @@ casper.notebook_test(function () {
         this.waitFor(function() {
             return this.evaluate(function() { return window.a; });
         });
-        
+
         this.waitFor(function() {
             return this.evaluate(function() { return window.a; });
         });

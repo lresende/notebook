@@ -52,20 +52,20 @@ casper.notebook_test(function () {
     // Wait for the dialog to fade in completely.
     this.waitForSelector('div.modal', function() {
         this.evaluate(function(){
-            IPython.modal_shown = false;
+            Jupyter.modal_shown = false;
             $('div.modal').on('shown.bs.modal', function (){
-                IPython.modal_shown = true;
+                Jupyter.modal_shown = true;
             });
             $('div.modal').on('hidden.bs.modal', function (){
-                IPython.modal_shown = false;
+                Jupyter.modal_shown = false;
             });
         });
-        
+
     });
 
     this.waitFor(function () {
         return this.evaluate(function(){
-            return IPython.modal_shown;
+            return Jupyter.modal_shown;
         });
     },
     function() {
@@ -81,7 +81,7 @@ casper.notebook_test(function () {
     // Wait for the dialog to fade out completely.
     this.waitFor(function () {
         return this.evaluate(function(){
-            return !IPython.modal_shown;
+            return !Jupyter.modal_shown;
         });
     },
     function() {

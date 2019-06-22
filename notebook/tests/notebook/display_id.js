@@ -3,7 +3,7 @@
 //
 
 casper.notebook_test(function () {
-    
+
     function get_outputs(cell_idx) {
         var outputs_json = casper.evaluate(function (cell_idx) {
             var cell = Jupyter.notebook.get_cell(cell_idx);
@@ -11,13 +11,13 @@ casper.notebook_test(function () {
         }, {cell_idx: cell_idx});
         return JSON.parse(outputs_json);
     }
-    
+
     this.thenEvaluate(function () {
         Jupyter.notebook.insert_cell_at_index("code", 0);
         var cell = Jupyter.notebook.get_cell(0);
         cell.set_text([
             "ip = get_ipython()",
-            "from IPython.display import display",
+            "from Jupyter.display import display",
             "def display_with_id(obj, display_id, update=False, execute_result=False):",
             "  iopub = ip.kernel.iopub_socket",
             "  session = get_ipython().kernel.session",
@@ -97,7 +97,7 @@ casper.notebook_test(function () {
             "display_with_id(6, 'here', update=True)",
         ].join('\n'));
         cell.execute();
-        var kernel = IPython.notebook.kernel;
+        var kernel = Jupyter.notebook.kernel;
         var msg_id = cell.last_msg_id;
         var callback_id = 'mycallbackid'
         cell.iopub_messages = [];
@@ -116,7 +116,7 @@ casper.notebook_test(function () {
 
     this.waitFor(function () {
         return this.evaluate(function () {
-            var cell = IPython.notebook.get_cell(3);
+            var cell = Jupyter.notebook.get_cell(3);
             return cell.iopub_messages.length >= 2;
         });
     });
@@ -124,7 +124,7 @@ casper.notebook_test(function () {
 
     this.then(function () {
         var returned = this.evaluate(function () {
-            var cell = IPython.notebook.get_cell(3);
+            var cell = Jupyter.notebook.get_cell(3);
             return [cell.output_area.outputs, cell.iopub_messages];
         });
         var cell_results = returned[0];

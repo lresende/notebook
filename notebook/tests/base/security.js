@@ -36,20 +36,20 @@ var truncate = function (s, n) {
 casper.notebook_test(function () {
     this.each(safe_tests, function (self, item) {
         var sanitized = self.evaluate(function (item) {
-            return IPython.security.sanitize_html(item);
+            return Jupyter.security.sanitize_html(item);
         }, item);
-        
+
         // string equality may be too strict, but it works for now
         this.test.assertEquals(sanitized, item, "Safe: '" + truncate(item, 32) + "'");
     });
-    
+
     this.each(unsafe_tests, function (self, item) {
         var sanitized = self.evaluate(function (item) {
-            return IPython.security.sanitize_html(item);
+            return Jupyter.security.sanitize_html(item);
         }, item);
-        
-        this.test.assertNotEquals(sanitized, item, 
-            "Sanitized: '" + truncate(item, 32) + 
+
+        this.test.assertNotEquals(sanitized, item,
+            "Sanitized: '" + truncate(item, 32) +
             "' => '" + truncate(sanitized, 32) + "'"
         );
         this.test.assertEquals(sanitized.indexOf("alert"), -1, "alert removed");

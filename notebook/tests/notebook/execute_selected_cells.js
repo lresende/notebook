@@ -34,7 +34,7 @@ casper.notebook_test(function () {
 
     this.then(function () {
         this.evaluate(function () {
-            IPython.notebook.clear_all_output();
+            Jupyter.notebook.clear_all_output();
         });
     })
 
@@ -58,7 +58,7 @@ casper.notebook_test(function () {
     // execute and insert below when there are selected cells
     this.then(function () {
         this.evaluate(function () {
-            IPython.notebook.clear_all_output();
+            Jupyter.notebook.clear_all_output();
         });
 
         this.select_cell(1);
@@ -78,7 +78,7 @@ casper.notebook_test(function () {
     // check that it doesn't affect run all above
     this.then(function () {
         this.evaluate(function () {
-            IPython.notebook.clear_all_output();
+            Jupyter.notebook.clear_all_output();
         });
 
         this.select_cell(1);
@@ -98,7 +98,7 @@ casper.notebook_test(function () {
     // check that it doesn't affect run all below
     this.then(function () {
         this.evaluate(function () {
-            IPython.notebook.clear_all_output();
+            Jupyter.notebook.clear_all_output();
         });
 
         this.select_cell(1);
@@ -120,7 +120,7 @@ casper.notebook_test(function () {
     // check that it doesn't affect run all
     this.then(function () {
         this.evaluate(function () {
-            IPython.notebook.clear_all_output();
+            Jupyter.notebook.clear_all_output();
         });
 
         this.select_cell(1);
@@ -149,7 +149,7 @@ casper.notebook_test(function () {
         this.trigger_keydown('alt-enter');
 
     });
-    
+
     this.wait_for_output(0);
     this.wait_for_output(1);
     this.then(function () {
@@ -168,7 +168,7 @@ casper.notebook_test(function () {
         });
 
     });
-    
+
     this.wait_for_output(1);
     this.wait_for_output(2);
     this.then(function () {

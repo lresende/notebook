@@ -7,7 +7,7 @@ casper.notebook_test(function () {
     var that = this;
     var get_info = function () {
         return that.evaluate(function () {
-            return JSON.parse(JSON.stringify(IPython.notebook.session._get_model()));
+            return JSON.parse(JSON.stringify(Jupyter.notebook.session._get_model()));
         });
     };
 
@@ -18,19 +18,19 @@ casper.notebook_test(function () {
 
     // test list
     this.thenEvaluate(function () {
-        IPython._sessions = null;
-        IPython.notebook.session.list(function (data) {
-            IPython._sessions = data;
+        Jupyter._sessions = null;
+        Jupyter.notebook.session.list(function (data) {
+            Jupyter._sessions = data;
         });
     });
     this.waitFor(function () {
         return this.evaluate(function () {
-            return IPython._sessions !== null;
+            return Jupyter._sessions !== null;
         });
     });
     this.then(function () {
         var num_sessions = this.evaluate(function () {
-            return IPython._sessions.length;
+            return Jupyter._sessions.length;
         });
         this.test.assertEquals(num_sessions, 1, 'one session running');
     });
@@ -38,19 +38,19 @@ casper.notebook_test(function () {
     // test get_info
     var session_info = get_info();
     this.thenEvaluate(function () {
-        IPython._session_info = null;
-        IPython.notebook.session.get_info(function (data) {
-            IPython._session_info = data;
+        Jupyter._session_info = null;
+        Jupyter.notebook.session.get_info(function (data) {
+            Jupyter._session_info = data;
         });
     });
     this.waitFor(function () {
         return this.evaluate(function () {
-            return IPython._session_info !== null;
+            return Jupyter._session_info !== null;
         });
     });
     this.then(function () {
         var new_session_info = this.evaluate(function () {
-            return IPython._session_info;
+            return Jupyter._session_info;
         });
         this.test.assertEquals(session_info.name, new_session_info.name, 'session: notebook name correct');
         this.test.assertEquals(session_info.path, new_session_info.path, 'session: notebook path correct');
@@ -65,18 +65,18 @@ casper.notebook_test(function () {
     // when this is fixed we can properly run this test
     //
     // this.thenEvaluate(function () {
-    //     IPython._renamed = false;
-    //     IPython.notebook.session.rename_notebook(
+    //     Jupyter._renamed = false;
+    //     Jupyter.notebook.session.rename_notebook(
     //         "foo",
     //         "bar",
     //         function (data) {
-    //             IPython._renamed = true;
+    //             Jupyter._renamed = true;
     //         }
     //     );
     // });
     // this.waitFor(function () {
     //     return this.evaluate(function () {
-    //         return IPython._renamed;
+    //         return Jupyter._renamed;
     //     });
     // });
     // this.then(function () {
@@ -87,7 +87,7 @@ casper.notebook_test(function () {
 
     // test delete
     this.thenEvaluate(function () {
-        IPython.notebook.session.delete();
+        Jupyter.notebook.session.delete();
     });
     this.waitFor(this.kernel_disconnected);
     this.then(function () {
@@ -104,7 +104,7 @@ casper.notebook_test(function () {
         ],
         function () {
             this.thenEvaluate(function () {
-                IPython.notebook.session.start();
+                Jupyter.notebook.session.start();
             });
         }
     );
@@ -116,12 +116,12 @@ casper.notebook_test(function () {
         ['kernel_killed.Session'],
         function () {
             this.thenEvaluate(function () {
-                IPython.notebook.session.delete();
+                Jupyter.notebook.session.delete();
             });
         }
     );
 
-    this.thenEvaluate( function() {IPython.notebook.session.start()});
+    this.thenEvaluate( function() {Jupyter.notebook.session.start()});
     this.wait_for_kernel_ready();
 
     // check for events when restarting the session
@@ -135,7 +135,7 @@ casper.notebook_test(function () {
         ],
         function () {
             this.thenEvaluate(function () {
-                IPython.notebook.session.restart();
+                Jupyter.notebook.session.restart();
             });
         }
     );
@@ -152,9 +152,9 @@ casper.notebook_test(function () {
         ],
         function () {
             this.thenEvaluate(function () {
-                var cell = IPython.notebook.get_cell(0);
+                var cell = Jupyter.notebook.get_cell(0);
                 cell.set_text("import os\n" +
-                              "from IPython.kernel.connect import get_connection_file\n" +
+                              "from Jupyter.kernel.connect import get_connection_file\n" +
                               "with open(get_connection_file(), 'w') as f:\n" +
                               "    f.write('garbage')\n" +
                               "os._exit(1)");
@@ -167,7 +167,7 @@ casper.notebook_test(function () {
         20000
     );
 
-    this.thenEvaluate( function() {IPython.notebook.session.start()});
+    this.thenEvaluate( function() {Jupyter.notebook.session.start()});
     this.wait_for_kernel_ready();
 
     // check for events when starting a nonexistant kernel
@@ -179,7 +179,7 @@ casper.notebook_test(function () {
         ],
         function () {
             this.thenEvaluate(function () {
-                IPython.notebook.session.restart({kernel_name: 'foo'});
+                Jupyter.notebook.session.restart({kernel_name: 'foo'});
             });
         }
     );

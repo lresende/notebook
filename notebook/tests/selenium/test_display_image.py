@@ -16,7 +16,7 @@ b64_image_data = {
 def imports(notebook):
     commands = [
         'import base64',
-        'from IPython.display import display, Image',
+        'from Jupyter.display import display, Image',
     ]
     notebook.edit_cell(index=0, content="\n".join(commands))
     notebook.execute_cell(0)

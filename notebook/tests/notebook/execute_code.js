@@ -3,7 +3,7 @@
 //
 casper.notebook_test(function () {
     this.evaluate(function () {
-        var cell = IPython.notebook.get_cell(0);
+        var cell = Jupyter.notebook.get_cell(0);
         cell.set_text('a=10; print(a)');
         cell.execute();
     });
@@ -19,13 +19,13 @@ casper.notebook_test(function () {
 
     // do it again with the keyboard shortcut
     this.thenEvaluate(function () {
-        var cell = IPython.notebook.get_cell(0);
+        var cell = Jupyter.notebook.get_cell(0);
         cell.set_text('a=11; print(a)');
         cell.clear_output();
     });
 
     this.then(function(){
-        
+
         this.trigger_keydown('shift-enter');
     });
 
@@ -37,12 +37,12 @@ casper.notebook_test(function () {
         this.test.assertEquals(result.text, '11\n', 'cell execute (using ctrl-enter)');
         this.test.assertEquals(num_cells, 2, 'shift-enter adds a new cell at the bottom')
     });
-    
+
     // do it again with the keyboard shortcut
     this.thenEvaluate(function () {
-        IPython.notebook.select(1);
-        IPython.notebook.delete_cell();
-        var cell = IPython.notebook.get_cell(0);
+        Jupyter.notebook.select(1);
+        Jupyter.notebook.delete_cell();
+        var cell = Jupyter.notebook.get_cell(0);
         cell.set_text('a=12; print(a)');
         cell.clear_output();
     });
@@ -62,13 +62,13 @@ casper.notebook_test(function () {
 
     // press the "play" triangle button in the toolbar
     this.thenEvaluate(function () {
-        var cell = IPython.notebook.get_cell(0);
-        IPython.notebook.select(0);
+        var cell = Jupyter.notebook.get_cell(0);
+        Jupyter.notebook.select(0);
         cell.clear_output();
         cell.set_text('a=13; print(a)');
         $("button[data-jupyter-action='jupyter-notebook:run-cell-and-select-next']")[0].click()
     });
-    
+
     this.wait_for_output(0);
 
     this.then(function () {
@@ -78,10 +78,10 @@ casper.notebook_test(function () {
 
     // run code with skip_exception
     this.thenEvaluate(function () {
-        var cell0 = IPython.notebook.get_cell(0);
+        var cell0 = Jupyter.notebook.get_cell(0);
         cell0.set_text('raise IOError');
-        IPython.notebook.insert_cell_below('code',0);
-        var cell1 = IPython.notebook.get_cell(1);
+        Jupyter.notebook.insert_cell_below('code',0);
+        var cell1 = Jupyter.notebook.get_cell(1);
         cell1.set_text('a=14; print(a)');
         cell0.execute(false);
         cell1.execute();
@@ -95,10 +95,10 @@ casper.notebook_test(function () {
     });
 
     this.thenEvaluate(function () {
-        var cell0 = IPython.notebook.get_cell(0);
+        var cell0 = Jupyter.notebook.get_cell(0);
         cell0.set_text('raise IOError');
-        IPython.notebook.insert_cell_below('code',0);
-        var cell1 = IPython.notebook.get_cell(1);
+        Jupyter.notebook.insert_cell_below('code',0);
+        var cell1 = Jupyter.notebook.get_cell(1);
         cell1.set_text('a=14; print(a)');
         cell0.execute();
         cell1.execute();
@@ -108,7 +108,7 @@ casper.notebook_test(function () {
 
     this.then(function () {
         var outputs = this.evaluate(function() {
-            return IPython.notebook.get_cell(1).output_area.outputs;
+            return Jupyter.notebook.get_cell(1).output_area.outputs;
         })
         this.test.assertEquals(outputs.length, 0, 'cell execute, stop on error (default)');
     });

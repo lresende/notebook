@@ -18,10 +18,10 @@ def kernels_buffer_without_conn(notebook):
     # Assert that cell executed while kernel is disconnected still
     # executes when reconnected
     wait_for_kernel_ready(notebook)
-    notebook.browser.execute_script("IPython.notebook.kernel.stop_channels();")
+    notebook.browser.execute_script("Jupyter.notebook.kernel.stop_channels();")
     notebook.edit_cell(index=0, content="print(1 + 2)")
     notebook.execute_cell(0)
-    notebook.browser.execute_script("IPython.notebook.kernel.reconnect();")
+    notebook.browser.execute_script("Jupyter.notebook.kernel.reconnect();")
     wait_for_kernel_ready(notebook)
     assert wait_for_cell_text_output(notebook, 0) == "3"
     notebook.delete_cell(0)
@@ -34,7 +34,7 @@ def buffered_cells_execute_in_order(notebook):
     # Repeated execution of cell queued up in the kernel executes
     # each execution request in order.
     wait_for_kernel_ready(notebook)
-    notebook.browser.execute_script("IPython.notebook.kernel.stop_channels();")
+    notebook.browser.execute_script("Jupyter.notebook.kernel.stop_channels();")
     # k == 1
     notebook.execute_cell(1)
     # k == 2
@@ -44,7 +44,7 @@ def buffered_cells_execute_in_order(notebook):
     # k == 7
     notebook.execute_cell(2)
     notebook.execute_cell(4)
-    notebook.browser.execute_script("IPython.notebook.kernel.reconnect();")
+    notebook.browser.execute_script("Jupyter.notebook.kernel.reconnect();")
     wait_for_kernel_ready(notebook)
 
     # Check that current value of k is 7
